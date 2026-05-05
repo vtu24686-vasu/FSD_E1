@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Apply Job</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link" th:href="@{/student/dashboard}">Dashboard</a>
+        <a class="nav-link active" th:href="@{/student/jobs}">Search Jobs</a>
+        <a class="nav-link" th:href="@{/student/applied}">Applied Jobs</a>
+        <a class="nav-link" th:href="@{/student/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/student/details}">Student Details</a>
+        <a class="nav-link" th:href="@{/student/profile}">Profile</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3 th:text="'Apply - ' + ${job.title}"></h3><span class="muted">Complete details for this specific job</span></div>
+        <section class="page">
+            <div class="card">
+                <form th:action="@{'/student/apply/' + ${job.id}}" method="post" enctype="multipart/form-data">
+                    <div class="grid grid-2">
+                        <div>
+                            <label>Full Name</label><input class="input" th:value="${student.name}" readonly>
+                            <label>Email</label><input class="input" th:value="${student.email}" readonly>
+                            <label>Phone</label><input class="input" name="phone" required>
+                            <label>City</label><input class="input" name="city" required>
+                            <label>Highest Qualification</label><input class="input" name="highestQualification" required>
+                        </div>
+                        <div>
+                            <label>Specialization</label><input class="input" name="specialization" required>
+                            <label>Passing Year</label><input class="input" type="number" name="passingYear" required>
+                            <label>CGPA</label><input class="input" type="number" step="0.01" name="cgpa" required>
+                            <label>Resume (PDF for this job)</label><input class="input" type="file" name="resumeFile" accept=".pdf" required>
+                        </div>
+                    </div>
+                    <label>Cover Letter</label>
+                    <textarea class="input" rows="5" name="coverLetter" placeholder="Write why you are fit for this role" required></textarea>
+                    <button class="btn float-btn" type="submit">Submit Application</button>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Company Profile - JobPortal</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+    <form th:action="@{/logout}" method="post" style="display:inline"><button type="submit" class="btn btn-outline">Logout</button></form>
+  </div>
+</nav>
+<div style="max-width:760px;margin:3rem auto;padding:0 1.5rem;">
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div class="card" style="padding:2.5rem;">
+    <h1 style="font-size:1.7rem;font-weight:800;margin-bottom:1.5rem;">Company Profile</h1>
+    <form th:action="@{/employer/company}" method="post">
+      <div class="form-group"><label>Company Name</label><input name="companyName" class="form-control" th:value="${user.companyName}"/></div>
+      <div class="form-group"><label>Location</label><input name="companyLocation" class="form-control" th:value="${user.companyLocation}"/></div>
+      <div class="form-group"><label>Website</label><input name="companyWebsite" class="form-control" th:value="${user.companyWebsite}" placeholder="https://example.com"/></div>
+      <div class="form-group"><label>Description</label><textarea name="companyDescription" class="form-control" rows="6" th:text="${user.companyDescription}"></textarea></div>
+      <button type="submit" class="btn btn-primary">Save Company Profile</button>
+    </form>
+  </div>
+</div>
+<footer><p>Copyright 2026 <strong>JobPortal</strong>.</p></footer>
+</body>
+</html>

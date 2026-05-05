@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Jobs - JobPortal</title>
+  <meta name="description" content="Search, filter, sort, save, and apply for job listings."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/jobs}" class="nav-link active">Browse Jobs</a>
+    <th:block sec:authorize="isAuthenticated()">
+      <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+      <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+      </form>
+    </th:block>
+    <th:block sec:authorize="!isAuthenticated()">
+      <a th:href="@{/login}" class="btn btn-outline">Login</a>
+      <a th:href="@{/register}" class="btn btn-primary">Get Started</a>
+    </th:block>
+  </div>
+</nav>
+
+<div style="padding:3rem 2rem;text-align:center;border-bottom:1px solid var(--border);">
+  <h1 style="font-size:2rem;font-weight:800;margin-bottom:0.5rem;">Find Your Next Opportunity</h1>
+  <p style="color:var(--text-secondary);margin-bottom:1.5rem;" th:text="${jobPage.totalElements} + ' jobs available'">Jobs available</p>
+  <form th:action="@{/jobs}" method="get" class="advanced-search">
+    <input class="form-control" list="titleSuggestions" id="keywordInput" type="text" name="keyword" th:value="${keyword}" placeholder="Title, category, skill"/>
+    <datalist id="titleSuggestions"></datalist>
+    <input class="form-control" type="text" name="location" th:value="${location}" placeholder="Location"/>
+    <input class="form-control" type="text" name="company" th:value="${company}" placeholder="Company"/>
+    <select class="form-control" name="category">
+      <option value="">All categories</option>
+      <option th:each="cat : ${ {'Engineering','DevOps','Data & AI','Design','Management','Sales','Marketing','Finance','HR'} }" th:value="${cat}" th:text="${cat}" th:selected="${cat == category}">Category</option>
+    </select>
+    <select class="form-control" name="jobType">
+      <option value="">Any type</option>
+      <option th:each="type : ${ {'Full-time','Part-time','Internship','Contract','Remote'} }" th:value="${type}" th:text="${type}" th:selected="${type == jobType}">Type</option>
+    </select>
+    <input class="form-control" type="number" name="minSalary" th:value="${minSalary}" placeholder="Min salary"/>
+    <input class="form-control" type="number" name="maxSalary" th:value="${maxSalary}" placeholder="Max salary"/>
+    <select class="form-control" name="sort">
+      <option value="latest" th:selected="${sort == 'latest'}">Latest</option>
+      <option value="salary" th:selected="${sort == 'salary'}">Highest salary</option>
+      <option value="relevance" th:selected="${sort == 'relevance'}">Relevance</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</div>
+
+<div class="section" style="padding-top:2.5rem;">
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div th:if="${#lists.isEmpty(jobs)}" style="text-align:center;padding:4rem 2rem;">
+    <h3 style="font-size:1.3rem;margin-bottom:0.5rem;">No jobs found</h3>
+    <p class="text-muted">Try another search term or <a th:href="@{/jobs}" style="color:var(--primary-light);">browse all jobs</a>.</p>
+  </div>
+
+  <div class="card-grid" th:unless="${#lists.isEmpty(jobs)}">
+    <div th:each="job : ${jobs}" class="card fade-in">
+      <div class="job-card-header">
+        <div class="company-avatar" th:text="${job.title.substring(0,1).toUpperCase()}">J</div>
+        <div>
+          <div class="job-title" th:text="${job.title}">Job Title</div>
+          <a class="job-company" th:href="@{/jobs/companies/{id}(id=${job.employer.id})}" th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.name}">Company</a>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag location" th:text="${job.location}">Location</span>
+        <span class="tag exp" th:text="${job.experienceLevel}">Exp</span>
+        <span class="tag" th:text="${job.category}">Category</span>
+        <span class="tag" th:if="${job.jobType != null}" th:text="${job.jobType}">Type</span>
+        <span class="tag" th:if="${job.salary != null && !job.salary.isBlank()}" th:text="${job.salary}">Salary</span>
+      </div>
+      <p class="text-muted" style="font-size:0.88rem;margin-bottom:1.2rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;" th:text="${job.description}">Description</p>
+      <div style="display:flex;gap:0.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+        <span style="font-size:0.78rem;color:var(--text-secondary);">
+          Posted <span th:text="${#temporals.format(job.createdAt,'dd MMM yyyy')}">Date</span>
+          <span th:if="${job.deadline != null}"> | Expires <span th:text="${#temporals.format(job.deadline,'dd MMM yyyy')}">Deadline</span></span>
+        </span>
+        <div style="display:flex;gap:0.5rem;">
+          <form sec:authorize="hasRole('STUDENT')" th:action="@{/jobs/{id}/save(id=${job.id})}" method="post">
+            <button type="submit" class="btn btn-outline btn-sm" th:text="${savedJobIds != null && savedJobIds.contains(job.id) ? 'Saved' : 'Save'}">Save</button>
+          </form>
+          <a th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-primary btn-sm">View</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination" th:if="${jobPage.totalPages > 1}">
+    <a class="btn btn-outline btn-sm" th:if="${jobPage.hasPrevious()}" th:href="@{/jobs(keyword=${keyword},location=${location},company=${company},category=${category},jobType=${jobType},minSalary=${minSalary},maxSalary=${maxSalary},sort=${sort},page=${jobPage.number - 1})}">Previous</a>
+    <span class="text-muted" th:text="${'Page ' + (jobPage.number + 1) + ' of ' + jobPage.totalPages}">Page</span>
+    <a class="btn btn-outline btn-sm" th:if="${jobPage.hasNext()}" th:href="@{/jobs(keyword=${keyword},location=${location},company=${company},category=${category},jobType=${jobType},minSalary=${minSalary},maxSalary=${maxSalary},sort=${sort},page=${jobPage.number + 1})}">Next</a>
+  </div>
+</div>
+
+<div th:replace="~{fragments/chatbot :: chatbot}"></div>
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a> | <a th:href="@{/register}">Sign Up</a></p></footer>
+<script>
+const input = document.getElementById('keywordInput');
+const list = document.getElementById('titleSuggestions');
+if (input) {
+  input.addEventListener('input', () => {
+    if (input.value.length < 2) return;
+    fetch('/jobs/suggest?term=' + encodeURIComponent(input.value))
+      .then(r => r.json())
+      .then(items => {
+        list.innerHTML = '';
+        items.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          list.appendChild(option);
+        });
+      });
+  });
+}
+</script>
+</body>
+</html>

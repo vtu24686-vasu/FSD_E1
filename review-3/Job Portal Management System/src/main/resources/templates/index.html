@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JobPortal – Find Your Dream Job</title>
+  <meta name="description" content="Connect with top employers. Search thousands of jobs across all industries. Start your career journey today."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}" class="nav-link">Browse Jobs</a>
+    <th:block sec:authorize="isAuthenticated()">
+      <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+      <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+      </form>
+    </th:block>
+    <th:block sec:authorize="!isAuthenticated()">
+      <a th:href="@{/login}"    class="btn btn-outline">Login</a>
+      <a th:href="@{/register}" class="btn btn-primary">Get Started</a>
+    </th:block>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content fade-in">
+    <div class="hero-badge">🚀 #1 Job Platform in India</div>
+    <h1>Find Your <span class="highlight">Dream Job</span><br/>Launch Your Career</h1>
+    <p>Connect with 500+ top employers. Discover roles that match your skills, passion, and ambition.</p>
+
+    <!-- Search -->
+    <form sec:authorize="hasRole('STUDENT')" th:action="@{/jobs}" method="get" class="search-bar" style="max-width:580px;margin:2rem auto;">
+      <input type="text" name="keyword" placeholder="Search by title, location or category…" autocomplete="off"/>
+      <button type="submit" class="btn btn-primary">🔍 Search</button>
+    </form>
+
+    <div class="hero-actions" sec:authorize="!isAuthenticated()">
+      <a th:href="@{/register}" class="btn btn-primary" style="font-size:1rem;padding:0.8rem 2rem;">Post a Job</a>
+      <a th:href="@{/login}"    class="btn btn-outline" style="font-size:1rem;padding:0.8rem 2rem;">Student Login</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item"><div class="num" th:text="${featuredJobs != null ? #lists.size(featuredJobs) + '+' : '6+'}">6+</div><div class="lbl">Live Jobs</div></div>
+  <div class="stat-item"><div class="num">500+</div><div class="lbl">Companies</div></div>
+  <div class="stat-item"><div class="num">10K+</div><div class="lbl">Happy Hires</div></div>
+  <div class="stat-item"><div class="num">50+</div><div class="lbl">Categories</div></div>
+</div>
+
+<!-- FEATURED JOBS -->
+<div class="section">
+  <div class="section-header">
+    <h2>✨ Featured Opportunities</h2>
+    <p>Handpicked roles from leading companies, updated daily</p>
+  </div>
+  <div class="card-grid">
+    <div th:each="job : ${featuredJobs}" class="card fade-in">
+      <div class="job-card-header">
+        <div class="company-avatar" th:text="${job.title.substring(0,1).toUpperCase()}">J</div>
+        <div>
+          <div class="job-title" th:text="${job.title}">Job Title</div>
+          <div class="job-company" th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.name}">Company</div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag location">📍 <span th:text="${job.location}">Location</span></span>
+        <span class="tag exp">⚡ <span th:text="${job.experienceLevel}">Exp</span></span>
+        <span class="tag" th:text="${job.category}">Category</span>
+      </div>
+      <p class="text-muted" style="font-size:0.88rem;margin-bottom:1.2rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;" th:text="${job.description}">Description</p>
+      <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-primary btn-sm w-full" style="justify-content:center;">View &amp; Apply →</a>
+      <a sec:authorize="!hasRole('STUDENT')" th:href="@{/login}" class="btn btn-primary btn-sm w-full" style="justify-content:center;">Login to Apply →</a>
+    </div>
+  </div>
+  <div class="text-center mt-3">
+    <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}" class="btn btn-outline" style="padding:0.8rem 2.5rem;">View All Jobs →</a>
+    <a sec:authorize="!hasRole('STUDENT')" th:href="@{/login}" class="btn btn-outline" style="padding:0.8rem 2.5rem;">Login as Student →</a>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="section">
+    <div class="section-header">
+      <h2>Why Choose JobPortal?</h2>
+      <p>Everything you need to land your next role</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🎯</div><h3>Smart Matching</h3><p>AI-powered recommendations based on your skills and experience.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔔</div><h3>Instant Alerts</h3><p>Get email notifications the moment your application status changes.</p></div>
+      <div class="feature-card"><div class="feature-icon">📄</div><h3>Resume Upload</h3><p>Upload your resume once, apply everywhere with a single click.</p></div>
+      <div class="feature-card"><div class="feature-icon">🏢</div><h3>Top Employers</h3><p>Access exclusive job listings from Fortune 500 and top startups.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 <strong>JobPortal</strong>. Built with ☕ Spring Boot &amp; ♥ Thymeleaf.
+    <span class="text-muted"> | <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}">Browse Jobs</a> | <a th:href="@{/register}">Sign Up</a></span>
+  </p>
+</footer>
+
+</body>
+</html>

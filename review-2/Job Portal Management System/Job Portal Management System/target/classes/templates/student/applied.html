@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Applied Jobs</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link" th:href="@{/student/dashboard}">Dashboard</a>
+        <a class="nav-link" th:href="@{/student/jobs}">Search Jobs</a>
+        <a class="nav-link active" th:href="@{/student/applied}">Applied Jobs</a>
+        <a class="nav-link" th:href="@{/student/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/student/profile}">Profile</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3>Application Tracker</h3><span class="muted">Realtime-like status badges</span></div>
+        <section class="page">
+            <div class="card">
+                <table class="table">
+                    <thead><tr><th>Job</th><th>Company</th><th>Applied On</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="app : ${applications}">
+                        <td th:text="${app.job.title}"></td>
+                        <td th:text="${app.job.employer.companyName}"></td>
+                        <td th:text="${#temporals.format(app.appliedAt, 'dd MMM yyyy')}"></td>
+                        <td><span class="badge" th:classappend="${app.status}" th:text="${app.status}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

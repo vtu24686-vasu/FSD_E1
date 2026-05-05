@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${(employer.companyName != null ? employer.companyName : employer.name) + ' - JobPortal'}">Company</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/jobs}" class="nav-link">Browse Jobs</a>
+    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+  </div>
+</nav>
+
+<div class="job-detail-wrap">
+  <a th:href="@{/jobs}" class="btn btn-outline btn-sm mb-2">Back to Jobs</a>
+  <div class="job-detail-header">
+    <div class="job-detail-avatar" th:text="${(employer.companyName != null ? employer.companyName : employer.name).substring(0,1).toUpperCase()}">C</div>
+    <div>
+      <h1 class="job-detail-title" th:text="${employer.companyName != null ? employer.companyName : employer.name}">Company</h1>
+      <p class="text-muted" th:text="${employer.companyLocation != null ? employer.companyLocation : employer.address}">Location</p>
+      <p th:if="${employer.companyWebsite != null && !employer.companyWebsite.isBlank()}"><a th:href="${employer.companyWebsite}" target="_blank" style="color:var(--primary-light);" th:text="${employer.companyWebsite}">Website</a></p>
+    </div>
+  </div>
+
+  <div class="job-body">
+    <h3>Company Profile</h3>
+    <p th:text="${employer.companyDescription != null && !employer.companyDescription.isBlank() ? employer.companyDescription : 'This employer is actively hiring through JobPortal.'}">Description</p>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Open Positions</h2>
+  <div class="card-grid">
+    <div th:each="job : ${openJobs}" class="card">
+      <div class="job-title" th:text="${job.title}">Job</div>
+      <div class="tags">
+        <span class="tag location" th:text="${job.location}">Location</span>
+        <span class="tag" th:text="${job.category}">Category</span>
+        <span class="tag" th:if="${job.jobType != null}" th:text="${job.jobType}">Type</span>
+      </div>
+      <a th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-primary btn-sm">View Job</a>
+    </div>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>.</p></footer>
+</body>
+</html>

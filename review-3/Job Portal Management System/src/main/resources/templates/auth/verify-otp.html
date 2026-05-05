@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Email Verification - JobPortal</title>
+  <meta name="description" content="Verify your JobPortal login with an email OTP."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <form th:action="@{/logout}" method="post" style="display:inline">
+      <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Cancel Login</button>
+    </form>
+  </div>
+</nav>
+
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <h2>Email Verification</h2>
+    <p class="subtitle">Enter the 6-digit OTP sent to <strong th:text="${email}">email</strong>.</p>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+    <form th:action="@{/verify-otp}" method="post">
+      <div class="form-group">
+        <label for="otp">Login OTP</label>
+        <input id="otp" name="otp" type="text" inputmode="numeric" maxlength="6" class="form-control" placeholder="123456" required autofocus/>
+      </div>
+      <button type="submit" class="btn btn-primary w-full mt-2" style="justify-content:center;padding:0.85rem;">Verify & Continue</button>
+    </form>
+
+    <form th:action="@{/verify-otp/resend}" method="post" class="text-center mt-2">
+      <button type="submit" class="btn btn-outline btn-sm">Resend OTP</button>
+    </form>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+</body>
+</html>

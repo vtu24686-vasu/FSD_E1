@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employer Dashboard - JobPortal</title>
+  <meta name="description" content="Manage job postings, company profile, analytics, and applicants."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/employer/company}" class="nav-link">Company Profile</a>
+    <a th:href="@{/dashboard}" class="nav-link active">Dashboard</a>
+    <form th:action="@{/logout}" method="post" style="display:inline">
+      <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+    </form>
+  </div>
+</nav>
+
+<div class="dashboard fade-in">
+  <div class="dashboard-header">
+    <div>
+      <h1>Welcome, <span class="welcome-name" th:text="${user.companyName != null ? user.companyName : user.name}">Company</span></h1>
+      <p class="text-muted">Manage listings, review candidates, and track hiring analytics.</p>
+    </div>
+    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+      <button class="btn btn-outline" type="button" onclick="document.body.classList.toggle('light-mode')">Toggle Mode</button>
+      <a th:href="@{/employer/jobs/new}" class="btn btn-primary">Post New Job</a>
+    </div>
+  </div>
+
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-icon purple">J</div><div><div class="kpi-num" th:text="${#lists.size(myJobs)}">0</div><div class="kpi-label">Job Posts</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon green">A</div><div><div class="kpi-num" th:text="${totalApplications}">0</div><div class="kpi-label">Applications</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon purple">S</div><div><div class="kpi-num" th:text="${shortlistedCandidates}">0</div><div class="kpi-label">Shortlisted</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon green">I</div><div><div class="kpi-num" th:text="${interviewsScheduled}">0</div><div class="kpi-label">Interviews</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon purple">H</div><div><div class="kpi-num" th:text="${selectedCandidates}">0</div><div class="kpi-label">Hired / Selected</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon red">R</div><div><div class="kpi-num" th:text="${rejectedCandidates}">0</div><div class="kpi-label">Rejected</div></div></div>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Hiring Statistics</h2>
+  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:1.5rem;margin-bottom:2rem;" class="analytics-grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:1rem;">
+        <div>
+          <div class="job-title">Pipeline Overview</div>
+          <p class="text-muted">Live status distribution across your job applications.</p>
+        </div>
+        <span class="tag" th:text="${activeJobs + ' active jobs'}">0 active jobs</span>
+      </div>
+      <div style="display:grid;gap:0.9rem;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;"><span>Shortlisted</span><strong th:text="${shortlistedCandidates}">0</strong></div>
+          <div class="bar"><span th:style="${'width:' + (totalApplications > 0 ? (shortlistedCandidates * 100 / totalApplications) : 0) + '%'}"></span></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;"><span>Under Review</span><strong th:text="${inReviewCandidates}">0</strong></div>
+          <div class="bar"><span th:style="${'width:' + (totalApplications > 0 ? (inReviewCandidates * 100 / totalApplications) : 0) + '%'}"></span></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;"><span>Interview Scheduled</span><strong th:text="${interviewsScheduled}">0</strong></div>
+          <div class="bar"><span th:style="${'width:' + (totalApplications > 0 ? (interviewsScheduled * 100 / totalApplications) : 0) + '%'}"></span></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;"><span>Rejected</span><strong th:text="${rejectedCandidates}">0</strong></div>
+          <div class="bar"><span th:style="${'width:' + (totalApplications > 0 ? (rejectedCandidates * 100 / totalApplications) : 0) + '%'}"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="job-title">Quick Insights</div>
+      <div style="display:grid;gap:1rem;margin-top:1rem;">
+        <div><p class="text-muted">Top performing job</p><strong th:text="${topJobTitle}">Role</strong><p class="text-muted"><span th:text="${topJobApplications}">0</span> application(s)</p></div>
+        <div><p class="text-muted">Average applications per job</p><strong th:text="${averageApplications}">0</strong></div>
+        <div><p class="text-muted">Closed or expired jobs</p><strong th:text="${closedJobs}">0</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Application Analytics</h2>
+  <div class="card-grid" style="margin-bottom:2rem;">
+    <div th:each="job : ${myJobs}" class="card">
+      <div class="job-title" th:text="${job.title}">Job</div>
+      <p class="text-muted" th:text="${job.jobType != null ? job.jobType + ' | ' + job.location : job.location}">Meta</p>
+      <div class="bar"><span th:style="${'width:' + ((job.applications != null ? #lists.size(job.applications) : 0) * 20 > 100 ? 100 : (job.applications != null ? #lists.size(job.applications) : 0) * 20) + '%'}"></span></div>
+      <p class="text-muted"><strong th:text="${job.applications != null ? #lists.size(job.applications) : 0}">0</strong> application(s)</p>
+      <a th:href="@{/employer/jobs/{id}/applicants(id=${job.id})}" class="btn btn-primary btn-sm mt-1">View Applicants</a>
+    </div>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Your Job Listings</h2>
+  <div th:if="${#lists.isEmpty(myJobs)}" style="text-align:center;padding:4rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);">
+    <h3 style="margin-bottom:0.5rem;">No jobs posted yet</h3>
+    <p class="text-muted">Post your first job to start receiving applications.</p>
+    <a th:href="@{/employer/jobs/new}" class="btn btn-primary mt-2">Post Your First Job</a>
+  </div>
+
+  <div class="table-wrap" th:unless="${#lists.isEmpty(myJobs)}">
+    <table class="table">
+      <thead><tr><th>Job Title</th><th>Type</th><th>Location</th><th>Salary</th><th>Deadline</th><th>Applicants</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr th:each="job : ${myJobs}">
+          <td style="font-weight:600;" th:text="${job.title}">Title</td>
+          <td><span class="tag" th:text="${job.jobType != null ? job.jobType : 'Full-time'}">Type</span></td>
+          <td class="text-muted" th:text="${job.location}">Loc</td>
+          <td class="text-muted" th:text="${job.salary != null ? job.salary : '-'}">Salary</td>
+          <td class="text-muted" th:text="${job.deadline != null ? #temporals.format(job.deadline,'dd MMM yyyy') : 'Open'}">Deadline</td>
+          <td><a th:href="@{/employer/jobs/{id}/applicants(id=${job.id})}" style="color:var(--primary-light);font-weight:600;text-decoration:none;"><span th:text="${job.applications != null ? #lists.size(job.applications) : 0}">0</span> view</a></td>
+          <td><span th:class="${job.active ? 'tag status-shortlisted' : 'tag status-rejected'}" th:text="${job.active ? 'ACTIVE' : 'CLOSED'}">ACTIVE</span></td>
+          <td>
+            <div style="display:flex;gap:0.5rem;">
+              <a th:href="@{/employer/jobs/{id}/edit(id=${job.id})}" class="btn btn-outline btn-sm">Edit</a>
+              <form th:action="@{/employer/jobs/{id}/delete(id=${job.id})}" method="post" onsubmit="return confirm('Delete this job?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+<style>@media(max-width:800px){.analytics-grid{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

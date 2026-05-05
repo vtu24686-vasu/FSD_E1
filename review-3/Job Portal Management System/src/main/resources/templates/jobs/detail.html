@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${job.title} + ' - JobPortal'">Job Detail</title>
+  <meta name="description" th:content="${job.description}"/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}" class="nav-link">Browse Jobs</a>
+    <th:block sec:authorize="isAuthenticated()">
+      <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+      <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+      </form>
+    </th:block>
+    <th:block sec:authorize="!isAuthenticated()">
+      <a th:href="@{/login}" class="btn btn-outline">Login</a>
+      <a th:href="@{/register}" class="btn btn-primary">Get Started</a>
+    </th:block>
+  </div>
+</nav>
+
+<div class="job-detail-wrap fade-in">
+  <a th:href="@{/jobs}" class="btn btn-outline btn-sm mb-2">Back to Jobs</a>
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div class="job-detail-header">
+    <div class="job-detail-avatar" th:text="${job.title.substring(0,1).toUpperCase()}">J</div>
+    <div style="flex:1;">
+      <h1 class="job-detail-title" th:text="${job.title}">Job Title</h1>
+      <p><a class="job-detail-company" th:href="@{/jobs/companies/{id}(id=${job.employer.id})}" th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.name}">Company</a></p>
+      <div class="tags">
+        <span class="tag location" th:text="${job.location}">Location</span>
+        <span class="tag exp" th:text="${job.experienceLevel}">Experience</span>
+        <span class="tag" th:text="${job.category}">Category</span>
+        <span class="tag" th:if="${job.jobType != null}" th:text="${job.jobType}">Type</span>
+        <span class="tag" th:if="${job.salary != null && !job.salary.isBlank()}" th:text="${job.salary}">Salary</span>
+        <span class="tag" th:if="${job.deadline != null}" th:text="${'Expires ' + #temporals.format(job.deadline,'dd MMM yyyy')}">Deadline</span>
+        <span style="font-size:0.8rem;color:var(--text-secondary);align-self:center;">Posted <span th:text="${#temporals.format(job.createdAt,'dd MMM yyyy')}">Date</span></span>
+      </div>
+    </div>
+
+    <div style="flex-shrink:0;">
+      <th:block sec:authorize="hasRole('STUDENT')">
+        <form th:action="@{/jobs/{id}/save(id=${job.id})}" method="post" style="margin-bottom:0.7rem;">
+          <button type="submit" class="btn btn-outline" th:text="${saved ? 'Saved Job' : 'Save Job'}">Save Job</button>
+        </form>
+        <div th:if="${alreadyApplied}" class="alert alert-success" style="margin:0;">Applied</div>
+      </th:block>
+      <th:block sec:authorize="!isAuthenticated()">
+        <a th:href="@{/login}" class="btn btn-primary" style="font-size:1rem;padding:0.8rem 2rem;">Login to Apply</a>
+      </th:block>
+    </div>
+  </div>
+
+  <div class="job-body">
+    <h3>Job Description</h3>
+    <p th:text="${job.description}">Description text here.</p>
+  </div>
+
+  <div sec:authorize="hasRole('STUDENT')" th:unless="${alreadyApplied}" class="job-body">
+    <h3>Application Form</h3>
+    <form th:action="@{/jobs/{id}/apply(id=${job.id})}" method="post" style="display:grid;gap:1rem;margin-top:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label>Name</label>
+          <input class="form-control" type="text" th:value="${currentUser.name}" readonly/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Email</label>
+          <input class="form-control" type="email" th:value="${currentUser.email}" readonly/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label for="expectedSalary">Expected Salary</label>
+          <input id="expectedSalary" name="expectedSalary" class="form-control" type="number" placeholder="900000"/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label for="availableFrom">Available From</label>
+          <input id="availableFrom" name="availableFrom" class="form-control" type="date"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label for="coverLetter">Cover Letter</label>
+        <textarea id="coverLetter" name="coverLetter" class="form-control" rows="5" placeholder="Briefly explain why you are a good fit for this role."></textarea>
+      </div>
+      <div class="alert alert-success" th:if="${currentUser.resumePath != null}">
+        Your profile resume will be attached to this application.
+      </div>
+      <div class="alert alert-error" th:if="${currentUser.resumePath == null}">
+        No resume found on your profile. You can still apply, or upload one from your profile first.
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-self:start;font-size:1rem;padding:0.8rem 2rem;">Submit Application</button>
+    </form>
+  </div>
+
+  <div class="job-body">
+    <h3>About the Company</h3>
+    <p th:text="${job.employer.companyName != null ? job.employer.companyName + ' is looking for talented individuals.' : job.employer.name + ' is hiring talented professionals.'}">Company info.</p>
+  </div>
+
+  <div class="job-body">
+    <h3>Location</h3>
+    <iframe th:src="${'https://www.google.com/maps?q=' + job.location + '&output=embed'}" style="width:100%;height:260px;border:0;border-radius:8px;" loading="lazy"></iframe>
+  </div>
+
+  <div class="text-center mt-3">
+    <a th:href="@{/jobs}" class="btn btn-outline">Browse More Jobs</a>
+  </div>
+</div>
+
+<div th:replace="~{fragments/chatbot :: chatbot}"></div>
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+<style>@media(max-width:700px){div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

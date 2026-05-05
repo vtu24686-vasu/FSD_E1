@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Student Dashboard</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link active" th:href="@{/student/dashboard}">Dashboard</a>
+        <a class="nav-link" th:href="@{/student/jobs}">Search Jobs</a>
+        <a class="nav-link" th:href="@{/student/applied}">Applied Jobs</a>
+        <a class="nav-link" th:href="@{/student/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/student/profile}">Profile</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3 th:text="'Welcome, ' + ${student.name}"></h3><span class="muted">Student Workspace</span></div>
+        <section class="page">
+            <div class="grid grid-3">
+                <div class="card stat-card"><p class="muted">Total Jobs</p><h2 th:text="${totalJobs}"></h2></div>
+                <div class="card stat-card"><p class="muted">Applied</p><h2 th:text="${jobsApplied}"></h2></div>
+                <div class="card stat-card"><p class="muted">Shortlisted</p><h2 th:text="${shortlisted}"></h2></div>
+            </div>
+            <div class="card">
+                <h3>Recommended Jobs</h3>
+                <div class="grid grid-3">
+                    <div class="card job-card" th:each="job : ${recentJobs}">
+                        <h4 th:text="${job.title}"></h4>
+                        <p class="muted" th:text="${job.location}"></p>
+                        <div class="chips">
+                            <span class="chip" th:each="s : ${#strings.arraySplit(job.skillsRequired, ',')}" th:text="${#strings.trim(s)}"></span>
+                        </div>
+                        <p class="muted" th:text="'Salary: ' + ${job.salary}"></p>
+                        <form th:action="@{'/student/apply/' + ${job.id}}" method="post"><button class="btn">Apply</button></form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

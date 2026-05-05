@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login – JobPortal</title>
+  <meta name="description" content="Sign in to your JobPortal account."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/register}" class="btn btn-primary">Register</a>
+  </div>
+</nav>
+
+<div class="auth-page">
+  <div class="auth-card fade-in">
+    <h2>Welcome Back 👋</h2>
+    <p class="subtitle">Sign in to continue your journey</p>
+
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+    <form th:action="@{/login}" method="post">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" class="form-control" placeholder="you@example.com" required autofocus/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" class="form-control" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-primary w-full mt-2" style="justify-content:center;padding:0.85rem;">Login →</button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <div class="text-center">
+      <p class="text-muted">Don't have an account? <a th:href="@{/register}" style="color:var(--primary-light);font-weight:600;">Register here</a></p>
+    </div>
+
+    <div class="alert alert-info mt-2" style="font-size:0.82rem;">
+      <strong>Demo Accounts:</strong><br/>
+      Student: alice@student.com / student123<br/>
+      Employer 1: vasudasari827@gmail.com / employer123<br/>
+      Employer 2: dasarivasu827@gmail.com / employer123<br/>
+      Employer 3: dasarivasu686@gmail.com / employer123<br/>
+      Employer 4: careers@finedge.com / employer123<br/>
+      Admin: admin@jobportal.com / admin123
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p>
+</footer>
+</body>
+</html>

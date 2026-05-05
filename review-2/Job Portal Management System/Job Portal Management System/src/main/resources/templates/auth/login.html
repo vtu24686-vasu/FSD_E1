@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login | JobPilot</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="auth-dark">
+<div class="auth-center-wrap">
+    <div class="auth-center-card">
+        <div class="brand" style="text-align:center;margin-bottom:8px;">JobPilot</div>
+        <h2 style="text-align:center;margin:0 0 8px;">Login Portal</h2>
+        <p class="muted" style="text-align:center;margin-top:0;">Student and Employer Access</p>
+        <form th:action="@{/login}" method="post">
+            <label>Email</label>
+            <input class="input" type="email" name="username" required>
+            <label>Password</label>
+            <input class="input" type="password" name="password" required>
+            <button class="btn float-btn" type="submit" style="width:100%;">Login</button>
+        </form>
+        <p class="muted" style="text-align:center;margin-bottom:0;">No account? <a th:href="@{/register}" style="color:#2563eb;font-weight:700;">Create account</a></p>
+    </div>
+</div>
+</body>
+</html>

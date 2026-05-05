@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Employer Notifications</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link" th:href="@{/employer/dashboard}">Dashboard</a>
+        <a class="nav-link" th:href="@{/employer/jobs}">Manage Jobs</a>
+        <a class="nav-link active" th:href="@{/employer/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3>Employer Notifications</h3><span class="muted">New applications and updates</span></div>
+        <section class="page">
+            <div class="card" th:each="app : ${applications}">
+                <div class="notice">
+                    <strong th:text="${app.student.name} + ' applied for ' + ${app.job.title}"></strong>
+                    <p class="muted" th:text="'Status: ' + ${app.status} + ' | ' + ${#temporals.format(app.appliedAt, 'dd MMM yyyy HH:mm')}"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

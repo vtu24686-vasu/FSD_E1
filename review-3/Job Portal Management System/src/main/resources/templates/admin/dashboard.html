@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - JobPortal</title>
+  <meta name="description" content="System administration panel for JobPortal."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/dashboard}" class="nav-link active">Admin Panel</a>
+    <form th:action="@{/logout}" method="post" style="display:inline">
+      <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+    </form>
+  </div>
+</nav>
+
+<div class="dashboard fade-in">
+  <div class="dashboard-header">
+    <div>
+      <h1><span class="welcome-name">Admin</span> Control Panel</h1>
+      <p class="text-muted">Monitor users, jobs, applications, and integrations.</p>
+    </div>
+    <a th:href="@{/h2-console}" target="_blank" class="btn btn-outline">H2 Console</a>
+  </div>
+
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-icon purple">U</div><div><div class="kpi-num" th:text="${totalUsers}">0</div><div class="kpi-label">Users</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon green">S</div><div><div class="kpi-num" th:text="${totalStudents}">0</div><div class="kpi-label">Students</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon purple">E</div><div><div class="kpi-num" th:text="${totalEmployers}">0</div><div class="kpi-label">Employers</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon green">J</div><div><div class="kpi-num" th:text="${totalJobs}">0</div><div class="kpi-label">Jobs</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon purple">A</div><div><div class="kpi-num" th:text="${totalApplications}">0</div><div class="kpi-label">Applications</div></div></div>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Users</h2>
+  <div class="table-wrap" style="margin-bottom:2rem;">
+    <table class="table">
+      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr th:each="u : ${users}">
+          <td th:text="${u.name}">Name</td>
+          <td class="text-muted" th:text="${u.email}">email</td>
+          <td><span class="tag" th:text="${u.role}">Role</span></td>
+          <td><span th:class="${u.active ? 'tag status-shortlisted' : 'tag status-rejected'}" th:text="${u.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span></td>
+          <td>
+            <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post">
+              <button type="submit" class="btn btn-outline btn-sm" th:text="${u.active ? 'Deactivate' : 'Activate'}">Toggle</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Job Postings</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Title</th><th>Employer</th><th>Location</th><th>Applications</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr th:each="job : ${jobs}">
+          <td th:text="${job.title}">Title</td>
+          <td th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.name}">Employer</td>
+          <td class="text-muted" th:text="${job.location}">Location</td>
+          <td th:text="${job.applications != null ? #lists.size(job.applications) : 0}">0</td>
+          <td><span th:class="${job.active ? 'tag status-shortlisted' : 'tag status-rejected'}" th:text="${job.active ? 'ACTIVE' : 'CLOSED'}">ACTIVE</span></td>
+          <td>
+            <form th:action="@{/admin/jobs/{id}/toggle(id=${job.id})}" method="post">
+              <button type="submit" class="btn btn-outline btn-sm" th:text="${job.active ? 'Close' : 'Reopen'}">Toggle</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+</body>
+</html>

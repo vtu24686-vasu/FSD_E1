@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Manage Jobs</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link" th:href="@{/employer/dashboard}">Dashboard</a>
+        <a class="nav-link active" th:href="@{/employer/jobs}">Manage Jobs</a>
+        <a class="nav-link" th:href="@{/employer/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3>Post and Manage Jobs</h3><span class="muted">Modern hiring board</span></div>
+        <section class="page grid grid-2">
+            <div class="card">
+                <h3>Post New Job</h3>
+                <form th:action="@{/employer/jobs}" method="post">
+                    <label>Title</label><input class="input" name="title" required>
+                    <label>Description</label><textarea class="input" name="description" required></textarea>
+                    <label>Skills Required</label><input class="input" name="skillsRequired" required>
+                    <label>Salary</label><input class="input" name="salary" required>
+                    <label>Location</label><input class="input" name="location" required>
+                    <label>Experience (years)</label><input class="input" type="number" name="minExperience" required>
+                    <button class="btn">Publish Job</button>
+                </form>
+            </div>
+            <div class="grid">
+                <div class="card job-card" th:each="job : ${jobs}">
+                    <h4 th:text="${job.title}"></h4>
+                    <p class="muted" th:text="${job.location}"></p>
+                    <div class="chips">
+                        <span class="chip" th:each="s : ${#strings.arraySplit(job.skillsRequired, ',')}" th:text="${#strings.trim(s)}"></span>
+                    </div>
+                    <div class="actions" style="margin-top:10px;">
+                        <a class="btn outline" th:href="@{'/employer/applicants/' + ${job.id}}">Applicants</a>
+                        <form th:action="@{'/employer/jobs/delete/' + ${job.id}}" method="post"><button class="btn danger">Delete</button></form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

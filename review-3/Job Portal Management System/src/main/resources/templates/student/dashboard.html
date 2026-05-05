@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard - JobPortal</title>
+  <meta name="description" content="Track your job applications and manage your profile."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/jobs}" class="nav-link">Browse Jobs</a>
+    <a th:href="@{/dashboard}" class="nav-link active">Dashboard</a>
+    <a th:href="@{/student/profile}" class="nav-link">Profile</a>
+    <form th:action="@{/logout}" method="post" style="display:inline">
+      <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+    </form>
+  </div>
+</nav>
+
+<div class="dashboard fade-in">
+  <div class="dashboard-header">
+    <div>
+      <h1>Welcome back, <span class="welcome-name" th:text="${user.name}">Student</span></h1>
+      <p class="text-muted">Track applications, improve your profile, and find matching jobs.</p>
+    </div>
+    <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+      <button class="btn btn-outline" type="button" onclick="document.body.classList.toggle('light-mode')">Toggle Mode</button>
+      <a th:href="@{/jobs}" class="btn btn-primary">Find New Jobs</a>
+    </div>
+  </div>
+
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-icon purple">A</div><div><div class="kpi-num" th:text="${#lists.size(myApplications)}">0</div><div class="kpi-label">Applications</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon green">S</div><div><div class="kpi-num" th:text="${positiveUpdates}">0</div><div class="kpi-label">Positive Updates</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon purple">P</div><div><div class="kpi-num" th:text="${inProgressApplications}">0</div><div class="kpi-label">In Progress</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon red">R</div><div><div class="kpi-num" th:text="${rejectedApplications}">0</div><div class="kpi-label">Rejected</div></div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.5rem;margin-bottom:2rem;" class="profile-grid">
+    <div class="card">
+      <div style="text-align:center;padding:1rem 0;">
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 1rem;">
+          <span th:text="${user.name.substring(0,1).toUpperCase()}">A</span>
+        </div>
+        <h3 th:text="${user.name}" style="font-size:1.1rem;font-weight:700;">Name</h3>
+        <p class="text-muted" th:text="${user.email}">email</p>
+        <a th:href="@{/student/profile}" class="btn btn-outline btn-sm mt-2">Edit Profile</a>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0;"/>
+      <div style="font-size:0.88rem;">
+        <p class="text-muted" style="margin-bottom:0.3rem;">Skills</p>
+        <p th:text="${user.skills != null && !user.skills.isBlank() ? user.skills : 'Not specified'}" style="font-weight:500;">Skills</p>
+        <p class="text-muted" style="margin-top:0.8rem;margin-bottom:0.3rem;">Education</p>
+        <p th:text="${user.education != null && !user.education.isBlank() ? user.education : 'Not specified'}" style="font-weight:500;">Education</p>
+        <p class="text-muted" style="margin-top:0.8rem;margin-bottom:0.3rem;">Resume</p>
+        <p th:if="${user.resumePath == null}" style="font-weight:500;">Not uploaded</p>
+        <a th:if="${user.resumePath != null}" th:href="@{${user.resumePath}}" target="_blank" style="color:var(--primary-light);font-weight:600;">View resume</a>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">My Applications</h2>
+      <div th:if="${#lists.isEmpty(myApplications)}" style="text-align:center;padding:3rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);">
+        <p class="text-muted">No applications yet.</p>
+        <a th:href="@{/jobs}" class="btn btn-primary mt-2">Browse Jobs</a>
+      </div>
+      <div class="table-wrap" th:unless="${#lists.isEmpty(myApplications)}">
+        <table class="table">
+          <thead><tr><th>Job Title</th><th>Company</th><th>Applied On</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr th:each="app : ${myApplications}">
+              <td><a th:href="@{/jobs/{id}(id=${app.job.id})}" style="color:var(--text-primary);font-weight:600;text-decoration:none;" th:text="${app.job.title}">Title</a></td>
+              <td th:text="${app.job.employer.companyName != null ? app.job.employer.companyName : app.job.employer.name}">Company</td>
+              <td th:text="${#temporals.format(app.appliedAt,'dd MMM yyyy')}">Date</td>
+              <td><span th:class="${'tag status-' + app.status.name().toLowerCase()}" th:text="${app.status}">Status</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;" class="profile-grid">
+    <div>
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Notification Center</h2>
+      <div class="card" th:if="${#lists.isEmpty(notifications)}">
+        <p class="text-muted">No notifications yet.</p>
+      </div>
+      <div class="card notification-card" th:each="note : ${notifications}">
+        <div style="display:flex;justify-content:space-between;gap:1rem;">
+          <div>
+            <strong th:text="${note.title}">Notification</strong>
+            <p class="text-muted" th:text="${note.message}">Message</p>
+            <a th:if="${note.link != null}" th:href="@{${note.link}}" style="color:var(--primary-light);font-size:0.85rem;">Open</a>
+          </div>
+          <form th:if="${!note.read}" th:action="@{/student/notifications/{id}/read(id=${note.id})}" method="post">
+            <button class="btn btn-outline btn-sm" type="submit">Read</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Saved Jobs</h2>
+      <div class="card" th:if="${#lists.isEmpty(savedJobs)}">
+        <p class="text-muted">Save jobs from the listings page to apply later.</p>
+      </div>
+      <div class="card" th:each="saved : ${savedJobs}">
+        <div class="job-title" th:text="${saved.job.title}">Job</div>
+        <p class="text-muted" th:text="${saved.job.employer.companyName != null ? saved.job.employer.companyName : saved.job.employer.name}">Company</p>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <a th:href="@{/jobs/{id}(id=${saved.job.id})}" class="btn btn-primary btn-sm">View</a>
+          <form th:action="@{/student/saved/{id}/toggle(id=${saved.job.id})}" method="post">
+            <button type="submit" class="btn btn-outline btn-sm">Remove</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:1rem;">Recommended Jobs</h2>
+  <div class="card-grid" th:if="${recommendedJobs != null && !#lists.isEmpty(recommendedJobs)}">
+    <div th:each="job : ${recommendedJobs}" class="card">
+      <div class="job-title" th:text="${job.title}">Job Title</div>
+      <div class="job-company" th:text="${job.employer.companyName != null ? job.employer.companyName : job.employer.name}">Company</div>
+      <div class="tags">
+        <span class="tag location" th:text="${job.location}">Location</span>
+        <span class="tag exp" th:text="${job.experienceLevel}">Experience</span>
+        <span class="tag" th:text="${job.category}">Category</span>
+      </div>
+      <a th:href="@{/jobs/{id}(id=${job.id})}" class="btn btn-primary btn-sm">View Match</a>
+    </div>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+<style>@media(max-width:768px){.profile-grid{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

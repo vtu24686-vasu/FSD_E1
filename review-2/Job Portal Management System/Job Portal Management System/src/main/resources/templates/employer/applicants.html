@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Applicants</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link" th:href="@{/employer/dashboard}">Dashboard</a>
+        <a class="nav-link active" th:href="@{/employer/jobs}">Manage Jobs</a>
+        <a class="nav-link" th:href="@{/employer/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3 th:text="'Applicants - ' + ${job.title}"></h3><a class="btn outline" th:href="@{/employer/jobs}">Back</a></div>
+        <section class="page">
+            <div class="card">
+                <table class="table">
+                    <thead><tr><th>Student</th><th>Email</th><th>Phone</th><th>Qualification</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    <tr th:each="app : ${applications}">
+                        <td th:text="${app.student.name}"></td>
+                        <td th:text="${app.student.email}"></td>
+                        <td th:text="${app.phone}"></td>
+                        <td th:text="${app.highestQualification}"></td>
+                        <td><span class="badge" th:classappend="${app.status}" th:text="${app.status}"></span></td>
+                        <td class="actions">
+                            <form th:action="@{'/employer/application/' + ${app.id} + '/status'}" method="post">
+                                <input type="hidden" name="jobId" th:value="${job.id}">
+                                <input type="hidden" name="status" value="SHORTLISTED">
+                                <button class="btn success" type="submit">Shortlist</button>
+                            </form>
+                            <form th:action="@{'/employer/application/' + ${app.id} + '/status'}" method="post">
+                                <input type="hidden" name="jobId" th:value="${job.id}">
+                                <input type="hidden" name="status" value="REJECTED">
+                                <button class="btn danger" type="submit">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

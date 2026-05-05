@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register | JobPilot</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-panel">
+        <div class="brand">JobPilot</div>
+        <h2>Create Account</h2>
+        <p class="muted">Register as Student or Employer</p>
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Student</h3>
+                <form th:action="@{/register/student}" method="post">
+                    <label>Name</label><input class="input" name="name" required>
+                    <label>Email</label><input class="input" type="email" name="email" required>
+                    <label>Password</label><input class="input" type="password" name="password" required>
+                    <label>Skills</label><input class="input" name="skills" required>
+                    <button class="btn" type="submit">Create Student Account</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Employer</h3>
+                <form th:action="@{/register/employer}" method="post">
+                    <label>Company Name</label><input class="input" name="companyName" required>
+                    <label>Email</label><input class="input" type="email" name="email" required>
+                    <label>Password</label><input class="input" type="password" name="password" required>
+                    <button class="btn" type="submit">Create Employer Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="auth-banner">
+        <h2>Hiring Meets Design</h2>
+        <p>Crafted to feel like modern job platforms with smooth cards, badges, and dashboard analytics.</p>
+    </div>
+</div>
+</body>
+</html>

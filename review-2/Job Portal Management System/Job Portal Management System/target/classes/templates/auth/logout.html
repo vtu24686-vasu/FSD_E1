@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Logged Out | JobPilot</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="auth-dark">
+<div class="auth-center-wrap">
+    <div class="auth-center-card">
+        <div class="brand" style="text-align:center;margin-bottom:8px;">JobPilot</div>
+        <h2 style="text-align:center;margin:0 0 8px;">You Have Logged Out</h2>
+        <p class="muted" style="text-align:center;margin-top:0;">Session closed successfully.</p>
+        <a class="btn float-btn" th:href="@{/login}" style="display:block;text-align:center;">Back to Login</a>
+    </div>
+</div>
+</body>
+</html>

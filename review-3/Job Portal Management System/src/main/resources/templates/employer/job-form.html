@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${job.id != null ? 'Edit Job' : 'Post New Job'} + ' - JobPortal'">Post Job</title>
+  <meta name="description" content="Post or edit a job listing on JobPortal."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+    <form th:action="@{/logout}" method="post" style="display:inline">
+      <button type="submit" class="btn btn-outline" style="cursor:pointer;font-family:inherit">Logout</button>
+    </form>
+  </div>
+</nav>
+
+<div style="max-width:700px;margin:3rem auto;padding:0 1.5rem;">
+  <a th:href="@{/dashboard}" class="btn btn-outline btn-sm mb-2">Back to Dashboard</a>
+
+  <div class="card fade-in" style="padding:2.5rem;">
+    <h1 style="font-size:1.7rem;font-weight:800;margin-bottom:0.3rem;" th:text="${job.id != null ? 'Edit Job Listing' : 'Post a New Job'}">Post Job</h1>
+    <p class="text-muted" style="margin-bottom:2rem;">Publish role details for job seekers to search and apply.</p>
+
+    <form th:action="${job.id != null ? '/employer/jobs/' + job.id + '/edit' : '/employer/jobs/new'}" method="post" th:object="${job}">
+      <input th:if="${job.id == null}" type="hidden" name="active" value="true"/>
+
+      <div class="form-group">
+        <label for="title">Job Title *</label>
+        <input id="title" name="title" type="text" class="form-control" placeholder="Senior Java Developer" th:value="${job.title}" required/>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label for="location">Location *</label>
+          <input id="location" name="location" type="text" class="form-control" placeholder="Bangalore / Remote" th:value="${job.location}" required/>
+        </div>
+        <div class="form-group">
+          <label for="salary">Salary</label>
+          <input id="salary" name="salary" type="text" class="form-control" placeholder="6 LPA - 10 LPA" th:value="${job.salary}"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label for="minSalary">Min Salary</label>
+          <input id="minSalary" name="minSalary" type="number" class="form-control" placeholder="600000" th:value="${job.minSalary}"/>
+        </div>
+        <div class="form-group">
+          <label for="maxSalary">Max Salary</label>
+          <input id="maxSalary" name="maxSalary" type="number" class="form-control" placeholder="1000000" th:value="${job.maxSalary}"/>
+        </div>
+        <div class="form-group">
+          <label for="deadline">Application Deadline</label>
+          <input id="deadline" name="deadline" type="date" class="form-control" th:value="${job.deadline}"/>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <select id="category" name="category" class="form-control" required>
+            <option value="" disabled th:selected="${job.category == null}">Select category</option>
+            <option th:each="cat : ${ {'Engineering','DevOps','Data & AI','Design','Management','Sales','Marketing','Finance','HR'} }" th:value="${cat}" th:text="${cat}" th:selected="${cat == job.category}">Category</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="experienceLevel">Experience Level *</label>
+          <select id="experienceLevel" name="experienceLevel" class="form-control" required>
+            <option value="" disabled th:selected="${job.experienceLevel == null}">Select experience</option>
+            <option th:each="exp : ${ {'Fresher','0-1 Year','1-3 Years','2-4 Years','3-5 Years','4+ Years','5+ Years','7+ Years'} }" th:value="${exp}" th:text="${exp}" th:selected="${exp == job.experienceLevel}">Exp</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="jobType">Job Type</label>
+        <select id="jobType" name="jobType" class="form-control">
+          <option value="" th:selected="${job.jobType == null}">Select job type</option>
+          <option th:each="type : ${ {'Full-time','Part-time','Internship','Contract','Remote'} }" th:value="${type}" th:text="${type}" th:selected="${type == job.jobType}">Type</option>
+        </select>
+      </div>
+
+      <div th:if="${job.id != null}" class="form-group">
+        <label><input type="checkbox" name="active" value="true" th:checked="${job.active}"/> Active listing</label>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Job Description *</label>
+        <textarea id="description" name="description" class="form-control" placeholder="Describe responsibilities, requirements, benefits, and interview process." rows="6" required th:text="${job.description}"></textarea>
+      </div>
+
+      <div style="display:flex;gap:1rem;justify-content:flex-end;margin-top:1.5rem;">
+        <a th:href="@{/dashboard}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary" th:text="${job.id != null ? 'Update Job' : 'Publish Job'}">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+<style>@media(max-width:600px){div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}}</style>
+</body>
+</html>

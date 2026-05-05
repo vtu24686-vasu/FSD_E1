@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="'Applicants for ' + ${job.title} + ' - JobPortal'">Applicants</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+    <form th:action="@{/logout}" method="post" style="display:inline"><button type="submit" class="btn btn-outline">Logout</button></form>
+  </div>
+</nav>
+
+<div class="dashboard fade-in">
+  <a th:href="@{/dashboard}" class="btn btn-outline btn-sm mb-2">Back to Dashboard</a>
+  <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+  <div class="card" style="padding:2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+    <div class="job-detail-avatar" style="width:60px;height:60px;font-size:1.5rem;" th:text="${job.title.substring(0,1).toUpperCase()}">J</div>
+    <div>
+      <h1 style="font-size:1.5rem;font-weight:800;" th:text="${job.title}">Job Title</h1>
+      <p class="text-muted" th:text="${job.location + ' | ' + job.experienceLevel}">Location</p>
+    </div>
+    <div style="margin-left:auto;"><span class="tag" style="font-size:0.95rem;padding:0.5rem 1rem;"><span th:text="${#lists.size(applications)}">0</span> Applicant(s)</span></div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(applications)}" style="text-align:center;padding:4rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);">
+    <h3 style="margin-bottom:0.5rem;">No applications yet</h3>
+    <p class="text-muted">Update the listing details or keep it open to attract candidates.</p>
+    <a th:href="@{/employer/jobs/{id}/edit(id=${job.id})}" class="btn btn-primary mt-2">Edit Job Listing</a>
+  </div>
+
+  <div class="table-wrap" th:unless="${#lists.isEmpty(applications)}">
+    <table class="table">
+      <thead><tr><th>Applicant</th><th>Skills</th><th>Application</th><th>Resume</th><th>Interview</th><th>Status</th><th>Update</th></tr></thead>
+      <tbody>
+        <tr th:each="app : ${applications}">
+          <td>
+            <strong th:text="${app.applicant.name}">Name</strong>
+            <p class="text-muted" th:text="${app.applicant.email}">email</p>
+            <p class="text-muted" th:text="${app.applicant.education != null ? app.applicant.education : 'Education not set'}">Education</p>
+          </td>
+          <td class="text-muted" style="max-width:190px;" th:text="${app.applicant.skills != null ? app.applicant.skills : 'No skills'}">Skills</td>
+          <td style="max-width:260px;">
+            <p class="text-muted" th:if="${app.coverLetter != null && !app.coverLetter.isBlank()}" th:text="${app.coverLetter}">Cover letter</p>
+            <p class="text-muted" th:if="${app.expectedSalary != null}" th:text="${'Expected: ₹' + app.expectedSalary}">Expected salary</p>
+            <p class="text-muted" th:if="${app.availableFrom != null}" th:text="${'Available: ' + #temporals.format(app.availableFrom,'dd MMM yyyy')}">Available</p>
+            <span th:if="${(app.coverLetter == null || app.coverLetter.isBlank()) && app.expectedSalary == null && app.availableFrom == null}" class="text-muted">No extra details</span>
+          </td>
+          <td>
+            <div th:if="${app.resumePath != null}" style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <a th:href="@{${app.resumePath}}" target="_blank" class="btn btn-outline btn-sm">View Resume</a>
+              <a th:href="@{${app.resumePath}}" download class="btn btn-primary btn-sm">Download</a>
+            </div>
+            <span th:if="${app.resumePath == null}" class="text-muted">No resume</span>
+          </td>
+          <td>
+            <div th:if="${app.interviewAt != null}">
+              <strong th:text="${#temporals.format(app.interviewAt,'dd MMM yyyy HH:mm')}">Interview</strong>
+              <p class="text-muted" th:text="${app.interviewMode != null ? app.interviewMode : 'Mode not set'}">Mode</p>
+            </div>
+            <form th:if="${app.interviewAt == null}" th:action="@{/employer/applications/{id}/interview(id=${app.id})}" method="post" style="display:grid;gap:0.4rem;min-width:190px;">
+              <input type="hidden" name="jobId" th:value="${job.id}"/>
+              <input name="interviewAt" type="datetime-local" class="form-control" style="font-size:0.82rem;padding:0.35rem;" required/>
+              <input name="interviewMode" class="form-control" placeholder="Online / Office" style="font-size:0.82rem;padding:0.35rem;"/>
+              <input name="interviewNotes" class="form-control" placeholder="Notes" style="font-size:0.82rem;padding:0.35rem;"/>
+              <button type="submit" class="btn btn-outline btn-sm">Schedule</button>
+            </form>
+          </td>
+          <td><span th:class="${'tag status-' + app.status.name().toLowerCase()}" th:text="${app.status}">Status</span></td>
+          <td>
+            <form th:action="@{/employer/applications/{id}/status(id=${app.id})}" method="post" style="display:flex;gap:0.4rem;align-items:center;">
+              <input type="hidden" name="jobId" th:value="${job.id}"/>
+              <select name="status" class="form-control" style="padding:0.35rem 0.6rem;font-size:0.82rem;border-radius:6px;width:auto;">
+                <option th:each="s : ${ {'APPLIED','UNDER_REVIEW','SHORTLISTED','REJECTED','INTERVIEW_SCHEDULED','SELECTED'} }" th:value="${s}" th:text="${s}" th:selected="${s == app.status.name()}">Status</option>
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer><p>Copyright 2026 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+</body>
+</html>

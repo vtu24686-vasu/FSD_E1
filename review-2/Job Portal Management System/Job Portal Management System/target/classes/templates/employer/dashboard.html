@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Employer Dashboard</title><link rel="stylesheet" th:href="@{/css/styles.css}"></head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">JobPilot</div>
+        <a class="nav-link active" th:href="@{/employer/dashboard}">Dashboard</a>
+        <a class="nav-link" th:href="@{/employer/jobs}">Manage Jobs</a>
+        <a class="nav-link" th:href="@{/employer/notifications}">Notifications</a>
+        <a class="nav-link" th:href="@{/logout}">Logout</a>
+    </aside>
+    <main class="main">
+        <div class="topbar"><h3 th:text="'Welcome, ' + ${employer.companyName}"></h3><span class="muted">Employer Workspace</span></div>
+        <section class="page">
+            <div class="grid grid-3">
+                <div class="card stat-card"><p class="muted">Jobs Posted</p><h2 th:text="${totalJobs}"></h2></div>
+                <div class="card stat-card"><p class="muted">Total Applicants</p><h2 th:text="${totalApplicants}"></h2></div>
+                <div class="card stat-card"><p class="muted">Shortlisted</p><h2 th:text="${shortlistedCount}"></h2></div>
+            </div>
+            <div class="card">
+                <h3>Recent Job Posts</h3>
+                <div class="grid grid-3">
+                    <div class="card job-card" th:each="job : ${jobs}">
+                        <h4 th:text="${job.title}"></h4>
+                        <p class="muted" th:text="${job.location}"></p>
+                        <p class="muted" th:text="'Salary: ' + ${job.salary}"></p>
+                        <a class="btn outline" th:href="@{'/employer/applicants/' + ${job.id}}">View Applicants</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:replace="~{::title}">Job Portal</title>
+  <meta name="description" th:replace="~{::meta[name='description']}"/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>"/>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar" th:fragment="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}" class="nav-link">Browse Jobs</a>
+
+    <th:block sec:authorize="isAuthenticated()">
+      <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+      <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit" class="btn btn-outline" style="border-radius:50px;padding:0.5rem 1.2rem;cursor:pointer;font-family:inherit">Logout</button>
+      </form>
+    </th:block>
+
+    <th:block sec:authorize="!isAuthenticated()">
+      <a th:href="@{/login}"    class="btn btn-outline">Login</a>
+      <a th:href="@{/register}" class="btn btn-primary">Get Started</a>
+    </th:block>
+  </div>
+</nav>
+
+<!-- Page body placeholder -->
+<div th:replace="~{::content}"></div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer th:fragment="footer">
+  <p>© 2025 <strong>JobPortal</strong>. Built with ☕ Spring Boot &amp; ♥ Thymeleaf.
+    <span class="text-muted"> | <a sec:authorize="hasRole('STUDENT')" th:href="@{/jobs}">Browse Jobs</a> | <a th:href="@{/register}">Sign Up</a></span>
+  </p>
+</footer>
+
+</body>
+</html>

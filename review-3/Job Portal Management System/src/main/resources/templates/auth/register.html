@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register – JobPortal</title>
+  <meta name="description" content="Create your JobPortal account as a Job Seeker or Employer."/>
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>"/>
+  <style>
+    .student-fields, .employer-fields { transition: all 0.3s ease; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <a th:href="@{/}" class="navbar-brand">Job<span>Portal</span></a>
+  <div class="nav-links">
+    <a th:href="@{/login}" class="btn btn-outline">Login</a>
+  </div>
+</nav>
+
+<div class="auth-page" style="padding:3rem 1rem;">
+  <div class="auth-card fade-in" style="max-width:520px;">
+    <h2>Join JobPortal 🚀</h2>
+    <p class="subtitle">Create your account and start your journey</p>
+
+    <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+
+    <!-- Role Toggle -->
+    <div class="role-toggle" id="roleToggle">
+      <button type="button" class="role-btn active" onclick="selectRole('STUDENT',this)">🎓 Job Seeker</button>
+      <button type="button" class="role-btn"         onclick="selectRole('EMPLOYER',this)">🏢 Employer</button>
+    </div>
+
+    <form th:action="@{/register}" method="post" id="registerForm">
+      <input type="hidden" name="role" id="roleInput" value="STUDENT"/>
+
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input id="name" name="name" type="text" class="form-control" placeholder="John Doe" required/>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" class="form-control" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" class="form-control" placeholder="Min. 6 characters" required minlength="6"/>
+      </div>
+
+      <!-- Student Fields -->
+      <div class="student-fields" id="studentFields">
+        <div class="form-group">
+          <label for="skills">Skills <span class="text-muted">(comma-separated)</span></label>
+          <input id="skills" name="skills" type="text" class="form-control" placeholder="Java, Spring Boot, SQL…"/>
+        </div>
+        <div class="form-group">
+          <label for="education">Education</label>
+          <input id="education" name="education" type="text" class="form-control" placeholder="B.Tech Computer Science"/>
+        </div>
+      </div>
+
+      <!-- Employer Fields -->
+      <div class="employer-fields hidden" id="employerFields">
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input id="companyName" name="companyName" type="text" class="form-control" placeholder="Your Company Ltd."/>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full mt-2" style="justify-content:center;padding:0.85rem;">Create Account →</button>
+    </form>
+
+    <div class="divider">or</div>
+    <div class="text-center">
+      <p class="text-muted">Already have an account? <a th:href="@{/login}" style="color:var(--primary-light);font-weight:600;">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<footer><p>© 2025 <strong>JobPortal</strong>. <a th:href="@{/}">Home</a></p></footer>
+
+<script>
+function selectRole(role, btn) {
+  document.getElementById('roleInput').value = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (role === 'STUDENT') {
+    document.getElementById('studentFields').classList.remove('hidden');
+    document.getElementById('employerFields').classList.add('hidden');
+  } else {
+    document.getElementById('studentFields').classList.add('hidden');
+    document.getElementById('employerFields').classList.remove('hidden');
+  }
+}
+</script>
+</body>
+</html>
